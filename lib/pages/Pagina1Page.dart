@@ -1,14 +1,36 @@
 import 'package:flutter/material.dart';
+import 'package:flutterr_estados/models/Usuario.dart';
+import 'package:flutterr_estados/services/UsuarioService.dart';
 
 class Pagina1Page extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Pagina 1'),
+        title: StreamBuilder(
+          stream: usuarioService.usuarioStream,
+          builder: (BuildContext context, AsyncSnapshot<Usuario> snapshot) {
+            return snapshot.hasData
+                ? Text('${snapshot.data.nombre}')
+                : Text('a');
+          },
+        ),
         centerTitle: true,
       ),
-      body: InformacionUsuario(),
+      body: StreamBuilder(
+        stream: usuarioService.usuarioStream,
+        builder: (BuildContext context, AsyncSnapshot<Usuario> snapshot) {
+          return snapshot.hasData
+              // usuarioService.userExist
+              ? InformacionUsuario(
+                  // user: usuarioService.usuario,
+                  user: snapshot.data,
+                )
+              : Center(
+                  child: Text('No hay informacion del usuario'),
+                );
+        },
+      ),
       floatingActionButton: FloatingActionButton(
         child: Icon(Icons.accessibility_new),
         onPressed: () => Navigator.pushNamed(context, 'pagina2'),
@@ -18,6 +40,10 @@ class Pagina1Page extends StatelessWidget {
 }
 
 class InformacionUsuario extends StatelessWidget {
+  final Usuario user;
+
+  const InformacionUsuario({this.user});
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -37,8 +63,8 @@ class InformacionUsuario extends StatelessWidget {
           Divider(
             color: Colors.black26,
           ),
-          ListTile(title: Text('Nombre')),
-          ListTile(title: Text('Edad')),
+          ListTile(title: Text('Nombre: ${user.nombre}')),
+          ListTile(title: Text('Edad: ${user.edad}')),
           Text(
             'Profesiones',
             style: TextStyle(
